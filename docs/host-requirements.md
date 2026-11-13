@@ -34,12 +34,17 @@ tighten.
 | `plugin.wasm` size | 16 MiB |
 | Linear memory per instance | 256 MiB |
 | Time per call (excluding time the user spends in a host dialog) | 30 s, `read-database`/`write-database` 120 s |
-| String or list passed in one call | 64 MiB |
-| File returned by `pick-file` | 64 MiB |
+| Byte list (`list<u8>`) passed in one call, in either direction | 8 MiB |
+| String passed in one call | 8 MiB |
 | Storage per plugin | 64 MiB, 1024 keys, 1024 files |
-| HTTP response body | 64 MiB |
 | Open TCP connections per plugin | 8 |
 | Log message | 4096 bytes, rate-limited |
+
+The byte-list cap covers the file returned by `pick-file`, storage files, HTTP bodies,
+`tcp-read`/`tcp-write` and database files. It is deliberately small: the dynamic value API
+of Wasmtime (C and .NET) represents `list<u8>` as one tagged value of 32 bytes per byte,
+so an 8 MiB list costs the host about 256 MiB for a moment. Larger data has to be moved
+in several calls.
 
 Exceeding a limit inside a host function returns the error `too-large` or `timeout`.
 Exceeding the memory or time limit of the plugin itself stops the call (fuel or epoch
@@ -75,12 +80,21 @@ handled the same way. Neither may crash or block the application.
 - `importer` output is shown to the user before anything is added to the database.
 - `password-generator` receives the generator settings only.
 
-## Open points for the first host implementation
+## Reference hosts
 
-These are decided by the Wasmtime proof of concept and may change the draft:
+The Wasmtime proof of concept of Ease Pass Qt (C API, Wasmtime 48) and a test host on
+wasmtime-dotnet 50 both load the conformance importer component unchanged, inspect its
+imports, refuse to instantiate it without the approved interface, and survive its trap,
+infinite-loop and memory tests. Components are therefore the plugin format; there is no
+core-module fallback.
 
-- Whether both hosts (C/C++ and .NET Wasmtime bindings) can load components. If not, the
-  same interface is carried by core modules with a small message ABI and the WIT files
-  remain the normative description.
-- Whether hosts should additionally accept components built for `wasm32-wasip2` by
-  satisfying the extra WASI imports with implementations that deny everything.
+Notes for host authors:
+
+- Define an (empty) instance for `easepass:plugin/types` in the linker; components import
+  it even though it only contains types.
+- wasmtime-dotnet has no wrapper for import/export inspection yet. Call
+  `wasmtime_component_type_import_nth`/`_export_nth` of the bundled native library, or read
+  the component's import section yourself.
+- After a trap or an interrupted call, discard the instance and its store.
+- Components built for `wasm32-wasip2` are not accepted (their extra WASI imports are not
+  on the allow-list).

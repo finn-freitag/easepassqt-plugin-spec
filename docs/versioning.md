@@ -32,7 +32,8 @@ abilities behind a permission id do not grow.
 ### Draft status
 
 `1.0.0` is a draft until a host has implemented it and the first official plugins run on
-it. Until then signatures may still change without a new major version. The repository
+it. The proof of concept settled the format (WebAssembly components, see
+[host requirements](host-requirements.md)). Until then signatures may still change without a new major version. The repository
 gets the tag `v1.0.0` when the draft is frozen.
 
 ## Plugins

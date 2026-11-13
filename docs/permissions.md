@@ -54,7 +54,7 @@ The set is fixed. New permissions only come with a new API version
   every time; the plugin receives the name and content of the one file the user chose,
   never a path.
 - **Network targets.** `network` covers every protocol (HTTP through `http-request`,
-  everything else through `tcp-connect`), but only to the hosts and ports listed in
+  everything else through the `tcp-*` functions), but only to the hosts and ports listed in
   `network_hosts` of the manifest. The host shows that list in the dialog and enforces it
   ([host requirements](host-requirements.md)). An entry with host `*` means "any server"
   and gets its own warning line.

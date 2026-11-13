@@ -67,7 +67,8 @@ interface file-picker {
     pick-file: func(options: pick-options) -> result<option<picked-file>, error>;
 }
 
-/// Permission `network`: every network protocol goes through these two functions. The host
+/// Permission `network`: every network protocol goes through `http-request` or the `tcp-*`
+/// functions. The host
 /// only connects to hosts declared in the manifest (`network_hosts`), blocks loopback and
 /// private address ranges unless the user allowed them, and enforces size and time caps.
 interface network {
@@ -106,20 +107,23 @@ interface network {
         timeout-ms: option<u32>,
     }
 
-    /// An open TCP connection (optionally TLS). Dropping the handle closes it.
-    resource tcp-connection {
-        /// Read up to `max-bytes`. Blocks until at least one byte is available.
-        /// An empty list means the peer closed the connection.
-        read: func(max-bytes: u32) -> result<list<u8>, error>;
-        /// Write bytes, returns how many were accepted (at least 1 for non-empty input).
-        write: func(data: list<u8>) -> result<u32, error>;
-        /// Upgrade a plain connection to TLS (STARTTLS, explicit FTPS, ...).
-        start-tls: func() -> result<_, error>;
-    }
+    /// Handle of an open TCP connection (optionally TLS). Valid until `tcp-close`; the host
+    /// closes every connection that is still open when the plugin instance ends. A plain
+    /// number instead of a WIT resource, because not every host binding supports resources.
+    type tcp-handle = u32;
 
     /// Open a TCP connection to `host:port`. `host` is a DNS name or IP literal and must
     /// be covered by the manifest allow-list.
-    tcp-connect: func(host: string, port: u16, options: tcp-options) -> result<tcp-connection, error>;
+    tcp-connect: func(host: string, port: u16, options: tcp-options) -> result<tcp-handle, error>;
+    /// Read up to `max-bytes`. Blocks until at least one byte is available.
+    /// An empty list means the peer closed the connection.
+    tcp-read: func(connection: tcp-handle, max-bytes: u32) -> result<list<u8>, error>;
+    /// Write bytes, returns how many were accepted (at least 1 for non-empty input).
+    tcp-write: func(connection: tcp-handle, data: list<u8>) -> result<u32, error>;
+    /// Upgrade a plain connection to TLS (STARTTLS, explicit FTPS, ...).
+    tcp-start-tls: func(connection: tcp-handle) -> result<_, error>;
+    /// Close a connection. Unknown handles are ignored.
+    tcp-close: func(connection: tcp-handle);
 }
 
 /// Permission `leak-check`: ask the host whether a password appears in known breaches.

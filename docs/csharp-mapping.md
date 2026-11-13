@@ -23,7 +23,7 @@ compatibility. The table shows where each concept went.
 | `IFilePickerInjectable` (returns a path) | import `file-picker`; returns the file **content**, plugins have no file system |
 | `IWarning` (marker for the sensitive-data dialog) | removed; "sensitive" is computed from types and permissions |
 | `IDatabasePaths` (obsolete) | removed |
-| direct use of .NET networking | import `network` (`http-request`, `tcp-connect`) with a host allow-list |
+| direct use of .NET networking | import `network` (`http-request`, `tcp-connect` and the other `tcp-*` functions) with a host allow-list |
 | `Task<T>` | synchronous calls on a worker thread of the host |
 | exceptions, `null`, `bool` success values | `result<T, error>` and `option<T>` |
 
