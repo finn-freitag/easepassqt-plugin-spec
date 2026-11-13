@@ -36,6 +36,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "conformance-network"
+version = "1.0.0"
+dependencies = [
+ "wit-bindgen",
+]
+
+[[package]]
 name = "conformance-password-generator"
 version = "1.0.0"
 dependencies = [

@@ -15,9 +15,7 @@ plugin holds the types and permissions a host must compute.
 | `database-source` | `database-source` | `storage` | `wasi:clocks/wall-clock` |
 | `password-generator` | `password-generator` | `leak-check` | `wasi:random/random` |
 | `store-feed` | `store-feed` | - | - |
-
-No conformance plugin uses `network` yet; a network test plugin is added together with
-the first host implementation of that interface.
+| `network` | `importer` | `network` | - |
 
 ## about
 
@@ -85,6 +83,26 @@ keys `database_name`, `read_only`, `last_modified`, `logged_in`).
 
 - `feed-sources()` returns one source: name `Conformance catalog`, URL
   `https://example.com/easepass/conformance/PluginList.json`.
+
+## network
+
+An importer whose **source id is a command**, so a host test can request anything. Its
+manifest allows `allowed.conformance.test:*`, `*.wild.conformance.test:*`,
+`port.conformance.test:8080` and `192.0.2.10:*`; test hosts map these names to a local
+server.
+
+- `sources()` returns `http` and `tcp` (descriptions only).
+- `import-passwords("http <METHOD> <url> [body]")` calls `http-request` with the header
+  `x-conformance: 1`, the optional body and a 5 s timeout. It returns one item:
+  display-name = status code, user-name = value of the response header
+  `x-conformance-reply` (empty if missing), notes = response body as text.
+- `import-passwords("tcp <host> <port> <plain|tls|starttls> <text>")` connects (5 s
+  timeout, `tls` = TLS from the start, `starttls` = `tcp-start-tls` after connecting),
+  writes `text` and a line feed, reads up to the first line feed or the end of the
+  stream, closes the connection and returns one item: display-name `tcp`, notes = the
+  line.
+- Errors of the host functions are returned unchanged. Malformed commands give
+  `invalid-argument`, anything else `not-found`.
 
 ## negative
 

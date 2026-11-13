@@ -12,7 +12,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 TARGET=wasm32-unknown-unknown
-PLUGINS=(about importer database-source password-generator store-feed)
+PLUGINS=(about importer database-source password-generator store-feed network)
 rm -rf dist
 mkdir -p dist/negative
 

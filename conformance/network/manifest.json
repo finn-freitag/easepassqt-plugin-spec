@@ -1,0 +1,17 @@
+{
+  "id": "org.easepass.conformance.network",
+  "name": "Conformance: network",
+  "version": "1.0.0",
+  "api_version": 1,
+  "description": "Performs the HTTP request or TCP exchange named by the source id.",
+  "author": "Ease Pass plugin spec",
+  "homepage": "https://github.com/finn-freitag/easepassqt-plugin-spec",
+  "license": "MIT",
+  "network_hosts": [
+    "allowed.conformance.test:*",
+    "*.wild.conformance.test:*",
+    "port.conformance.test:8080",
+    "192.0.2.10:*"
+  ],
+  "permissions": ["network"]
+}
