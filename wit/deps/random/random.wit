@@ -1,0 +1,13 @@
+// Subset of the WASI 0.2 `wasi:random` package (https://github.com/WebAssembly/wasi-random,
+// Apache-2.0 WITH LLVM-exception). Only the interface that Ease Pass hosts must provide is
+// vendored here; signatures are identical to upstream.
+package wasi:random@0.2.0;
+
+/// Cryptographically secure random data, provided by the host.
+interface random {
+    /// Return `len` cryptographically secure random bytes.
+    get-random-bytes: func(len: u64) -> list<u8>;
+
+    /// Return a cryptographically secure random `u64`.
+    get-random-u64: func() -> u64;
+}

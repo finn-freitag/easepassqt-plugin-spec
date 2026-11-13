@@ -1,0 +1,11 @@
+{
+  "id": "org.easepass.conformance.password-generator",
+  "name": "Conformance: password generator",
+  "version": "1.0.0",
+  "api_version": 1,
+  "description": "Generates passwords from host randomness.",
+  "author": "Ease Pass plugin spec",
+  "homepage": "https://github.com/finn-freitag/easepassqt-plugin-spec",
+  "license": "MIT",
+  "permissions": ["leak-check"]
+}

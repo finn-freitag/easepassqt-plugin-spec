@@ -1,0 +1,4 @@
+{
+  "types": ["password-generator"],
+  "permissions": ["leak-check"]
+}

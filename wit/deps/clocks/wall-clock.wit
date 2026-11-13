@@ -1,0 +1,19 @@
+// Subset of the WASI 0.2 `wasi:clocks` package (https://github.com/WebAssembly/wasi-clocks,
+// Apache-2.0 WITH LLVM-exception). Only the interface that Ease Pass hosts must provide is
+// vendored here; signatures are identical to upstream.
+package wasi:clocks@0.2.0;
+
+/// The current date and time as seen by the user's system.
+interface wall-clock {
+    /// A time and date in seconds plus nanoseconds since 1970-01-01T00:00:00Z.
+    record datetime {
+        seconds: u64,
+        nanoseconds: u32,
+    }
+
+    /// Read the current value of the clock.
+    now: func() -> datetime;
+
+    /// Query the resolution of the clock.
+    resolution: func() -> datetime;
+}

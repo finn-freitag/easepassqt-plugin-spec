@@ -1,0 +1,11 @@
+{
+  "id": "org.easepass.conformance.database-source",
+  "name": "Conformance: database source",
+  "version": "1.0.0",
+  "api_version": 1,
+  "description": "Keeps one database in the plugin's private storage.",
+  "author": "Ease Pass plugin spec",
+  "homepage": "https://github.com/finn-freitag/easepassqt-plugin-spec",
+  "license": "MIT",
+  "permissions": ["storage"]
+}

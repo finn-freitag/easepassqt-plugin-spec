@@ -1,0 +1,11 @@
+{
+  "id": "org.easepass.conformance.importer",
+  "name": "Conformance: importer",
+  "version": "1.0.0",
+  "api_version": 1,
+  "description": "Imports fixed items or a CSV file chosen by the user.",
+  "author": "Ease Pass plugin spec",
+  "homepage": "https://github.com/finn-freitag/easepassqt-plugin-spec",
+  "license": "MIT",
+  "permissions": ["pick-file"]
+}

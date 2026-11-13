@@ -1,0 +1,89 @@
+{
+  "$comment": "Machine-readable form of docs/permissions.md for API version 1. Hosts and tools/check_component.py read this file. Interface names are matched without the @version suffix; the major version must equal api_version.",
+  "api_version": 1,
+  "package": "easepass:plugin",
+  "neutral_imports": [
+    "easepass:plugin/types",
+    "easepass:plugin/log",
+    "wasi:random/random",
+    "wasi:clocks/wall-clock"
+  ],
+  "permissions": [
+    {
+      "id": "storage",
+      "import": "easepass:plugin/storage",
+      "text": "Keeps its own private settings and files"
+    },
+    {
+      "id": "pick-file",
+      "import": "easepass:plugin/file-picker",
+      "text": "Asks you to choose a file (every time)"
+    },
+    {
+      "id": "network",
+      "import": "easepass:plugin/network",
+      "text": "Connects to: {network_hosts} (any protocol)"
+    },
+    {
+      "id": "leak-check",
+      "import": "easepass:plugin/leak-check",
+      "text": "Checks passwords against a breach service (sends a hash prefix to a third party)"
+    }
+  ],
+  "types": [
+    {
+      "id": "about",
+      "export": "easepass:plugin/about",
+      "prompt": false,
+      "text": "Shows information about itself"
+    },
+    {
+      "id": "initializer",
+      "export": "easepass:plugin/initializer",
+      "prompt": false,
+      "text": "Runs when Ease Pass starts"
+    },
+    {
+      "id": "importer",
+      "export": "easepass:plugin/importer",
+      "prompt": true,
+      "text": "Adds passwords to your database"
+    },
+    {
+      "id": "database-source",
+      "export": "easepass:plugin/database-source",
+      "prompt": true,
+      "text": "Stores your encrypted database elsewhere (it only receives encrypted data)"
+    },
+    {
+      "id": "password-generator",
+      "export": "easepass:plugin/password-generator",
+      "prompt": true,
+      "text": "Generates passwords: its output becomes your passwords"
+    },
+    {
+      "id": "store-feed",
+      "export": "easepass:plugin/store-feed",
+      "prompt": true,
+      "text": "Provides additional plugin lists"
+    }
+  ],
+  "high_risk": [
+    {
+      "type": "database-source",
+      "permission": "network",
+      "text": "This plugin sends your encrypted database over the network."
+    },
+    {
+      "type": "password-generator",
+      "permission": "network",
+      "text": "This plugin creates your passwords and can send data over the network."
+    },
+    {
+      "type": "importer",
+      "permission": "network",
+      "text": "This plugin adds passwords to your database and can send data over the network."
+    }
+  ],
+  "network_wildcard_text": "This plugin can connect to ANY server."
+}

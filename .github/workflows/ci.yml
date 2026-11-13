@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust with the Wasm target
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+
+      - name: Install wasm-tools
+        uses: taiki-e/install-action@v2
+        with:
+          tool: wasm-tools
+
+      - name: Install jsonschema
+        run: python3 -m pip install --user jsonschema
+
+      - name: Validate WIT and schemas, build and check the conformance plugins
+        run: tools/check.sh
+
+      - name: Upload conformance plugins
+        uses: actions/upload-artifact@v4
+        with:
+          name: conformance-plugins
+          path: |
+            dist/*.wasm
+            dist/*.epplugin
+          if-no-files-found: error

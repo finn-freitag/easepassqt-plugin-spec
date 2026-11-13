@@ -1,0 +1,11 @@
+{
+  "id": "org.easepass.conformance.store-feed",
+  "name": "Conformance: store feed",
+  "version": "1.0.0",
+  "api_version": 1,
+  "description": "Returns one fixed catalog URL. Needs no permission.",
+  "author": "Ease Pass plugin spec",
+  "homepage": "https://github.com/finn-freitag/easepassqt-plugin-spec",
+  "license": "MIT",
+  "permissions": []
+}

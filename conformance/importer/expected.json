@@ -1,0 +1,4 @@
+{
+  "types": ["importer"],
+  "permissions": ["pick-file"]
+}

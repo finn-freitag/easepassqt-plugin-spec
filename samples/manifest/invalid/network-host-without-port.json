@@ -1,0 +1,1 @@
+{ "id": "com.example.plugin", "name": "Bad Host", "version": "1.0.0", "api_version": 1, "description": "", "network_hosts": ["example.com"] }

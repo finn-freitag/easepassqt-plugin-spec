@@ -1,0 +1,53 @@
+package easepass:plugin@1.0.0;
+
+// One world per plugin type (interface name + "-plugin", because worlds and interfaces
+// share one namespace). A plugin that has several types defines its own world:
+//
+//     world my-plugin {
+//         include easepass:plugin/importer-plugin@1.0.0;
+//         include easepass:plugin/about-plugin@1.0.0;
+//     }
+//
+// The worlds offer every host interface, but a component only imports what its code
+// really calls, and only those imports become permissions.
+
+/// Everything a host offers to plugins of API version 1.
+world host-imports {
+    import log;
+    import storage;
+    import file-picker;
+    import network;
+    import leak-check;
+    import wasi:random/random@0.2.0;
+    import wasi:clocks/wall-clock@0.2.0;
+}
+
+world about-plugin {
+    include host-imports;
+    export about;
+}
+
+world initializer-plugin {
+    include host-imports;
+    export initializer;
+}
+
+world importer-plugin {
+    include host-imports;
+    export importer;
+}
+
+world database-source-plugin {
+    include host-imports;
+    export database-source;
+}
+
+world password-generator-plugin {
+    include host-imports;
+    export password-generator;
+}
+
+world store-feed-plugin {
+    include host-imports;
+    export store-feed;
+}

@@ -1,0 +1,4 @@
+{
+  "types": ["database-source"],
+  "permissions": ["storage"]
+}

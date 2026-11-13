@@ -1,0 +1,138 @@
+package easepass:plugin@1.0.0;
+
+// Plugin interfaces (plugin exports). The host computes the plugin TYPE from the
+// interfaces a component exports. A plugin may export several of them.
+
+/// Type `about`: information shown in the plugin manager.
+interface about {
+    record plugin-info {
+        name: string,
+        description: string,
+        author: string,
+        /// Website of the author or the plugin (http/https), if any.
+        author-url: option<string>,
+    }
+
+    info: func() -> plugin-info;
+}
+
+/// Type `initializer`: code that runs once each time the host loads the plugin.
+interface initializer {
+    use types.{error};
+
+    /// Called before any other export. An error is logged and disables the plugin
+    /// until the next start.
+    init: func() -> result<_, error>;
+}
+
+/// Type `importer`: adds passwords from another service or file to the open database.
+interface importer {
+    use types.{error, password-item};
+
+    /// One entry in the "Import passwords" section of the settings page.
+    record import-source {
+        /// Stable id, unique within this plugin.
+        id: string,
+        /// Name shown to the user, e.g. "Bitwarden (JSON)".
+        name: string,
+        description: string,
+    }
+
+    /// The sources this plugin offers (at least one).
+    sources: func() -> list<import-source>;
+
+    /// Cheap check whether a source currently has something to import. The host may
+    /// skip this call.
+    passwords-available: func(source-id: string) -> result<bool, error>;
+
+    /// Return the passwords of one source. The host shows them to the user, who chooses
+    /// which ones are added. `cancelled` if the user aborted (e.g. closed a file dialog).
+    import-passwords: func(source-id: string) -> result<list<password-item>, error>;
+}
+
+/// Type `database-source`: stores ENCRYPTED database files somewhere else (server, cloud).
+/// The plugin only ever sees the encrypted bytes, never the master password or items.
+interface database-source {
+    use types.{error};
+
+    enum availability {
+        available,
+        locked-by-other-user,
+        unknown,
+        unavailable,
+    }
+
+    record database-info {
+        /// Stable id, unique within this plugin.
+        id: string,
+        /// Name shown in the database list.
+        name: string,
+        /// Where the database lives, e.g. a URL without credentials.
+        description: string,
+        read-only: bool,
+        availability: availability,
+        /// Last modification in seconds since 1970-01-01T00:00:00Z, if known.
+        last-modified: option<u64>,
+    }
+
+    /// Name of the provider, e.g. "FTP server".
+    provider-name: func() -> string;
+
+    /// JSON Schema (draft 2020-12, object with flat properties) of the configuration.
+    /// The host renders a form from it; plugins have no UI of their own.
+    config-schema: func() -> string;
+    /// Current configuration as JSON matching `config-schema`.
+    get-config: func() -> result<string, error>;
+    /// Validate and apply a configuration. `invalid-argument` if it is rejected; the
+    /// message is shown to the user.
+    set-config: func(config-json: string) -> result<_, error>;
+
+    /// All databases offered with the current configuration.
+    list-databases: func() -> result<list<database-info>, error>;
+    /// Fresh state of one database. The host polls this instead of a change callback.
+    get-database: func(id: string) -> result<database-info, error>;
+
+    /// Download the complete encrypted database file.
+    read-database: func(id: string) -> result<list<u8>, error>;
+    /// Replace the complete encrypted database file.
+    write-database: func(id: string, data: list<u8>) -> result<_, error>;
+
+    /// The user unlocked this database (e.g. create a remote lock).
+    login: func(id: string) -> result<_, error>;
+    /// The user locked this database again (e.g. release the remote lock).
+    logout: func(id: string) -> result<_, error>;
+}
+
+/// Type `password-generator`: its output becomes the user's passwords.
+interface password-generator {
+    use types.{error};
+
+    /// The user's generator settings.
+    record generator-options {
+        /// Desired length in characters.
+        length: u32,
+        /// Characters the password may contain.
+        characters: string,
+        /// The password should not appear in known breaches (use `leak-check`).
+        verify-not-leaked: bool,
+    }
+
+    /// Name shown in the generator selection.
+    name: func() -> string;
+
+    generate: func(options: generator-options) -> result<string, error>;
+}
+
+/// Type `store-feed`: provides additional plugin catalogs.
+interface store-feed {
+    use types.{error};
+
+    record feed-source {
+        /// Name shown as the catalog's title.
+        name: string,
+        /// https:// URL of a catalog JSON file (schemas/catalog.schema.json).
+        url: string,
+    }
+
+    feed-sources: func() -> result<list<feed-source>, error>;
+}

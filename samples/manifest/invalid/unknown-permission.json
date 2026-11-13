@@ -1,0 +1,1 @@
+{ "id": "com.example.plugin", "name": "Bad Permission", "version": "1.0.0", "api_version": 1, "description": "", "permissions": ["filesystem"] }

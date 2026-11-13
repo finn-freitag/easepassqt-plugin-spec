@@ -1,0 +1,66 @@
+package easepass:plugin@1.0.0;
+
+/// Types shared by all interfaces. Importing this interface grants nothing.
+interface types {
+    /// Machine-readable reason for a failed call.
+    enum error-code {
+        /// An argument was malformed (bad URL, unknown id, invalid JSON, ...).
+        invalid-argument,
+        /// The requested key, file, database or source does not exist.
+        not-found,
+        /// The host refused the call (host not on the allow-list, private address, ...).
+        not-allowed,
+        /// The resource exists but cannot be used right now (offline, locked, ...).
+        unavailable,
+        /// The call took longer than the host or the caller allows.
+        timeout,
+        /// A size cap was exceeded (file, request, response, storage quota).
+        too-large,
+        /// The user cancelled the operation.
+        cancelled,
+        /// A network error (DNS, connect, TLS, protocol).
+        network,
+        /// The operation is not supported by this plugin or host.
+        unsupported,
+        /// Any other failure.
+        internal,
+    }
+
+    /// Error value of every fallible call, in both directions.
+    record error {
+        code: error-code,
+        /// Human-readable text for logs and, for plugin errors, for the user.
+        /// MUST NOT contain secrets (passwords, TOTP secrets, tokens).
+        message: string,
+    }
+
+    /// Hash algorithm of a TOTP second factor.
+    enum totp-algorithm {
+        sha1,
+        sha256,
+        sha512,
+    }
+
+    /// TOTP second factor of a password item.
+    record totp {
+        /// Base32 secret.
+        secret: string,
+        /// Number of digits of a code (usually 6).
+        digits: u8,
+        /// Validity of a code in seconds (usually 30).
+        interval: u32,
+        algorithm: totp-algorithm,
+    }
+
+    /// One entry of a password database. Unknown values are empty strings.
+    record password-item {
+        display-name: string,
+        user-name: string,
+        email: string,
+        website: string,
+        password: string,
+        notes: string,
+        tags: list<string>,
+        totp: option<totp>,
+    }
+}

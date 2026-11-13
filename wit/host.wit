@@ -1,0 +1,144 @@
+package easepass:plugin@1.0.0;
+
+// Host interfaces (plugin imports). Every interface except `log` is a PERMISSION: the host
+// computes a plugin's permissions from the interfaces its component imports and shows them
+// to the user before installing. See docs/permissions.md.
+
+/// Write to the Ease Pass log. Always available, no permission.
+interface log {
+    enum level {
+        debug,
+        info,
+        warning,
+        error,
+    }
+
+    /// Append one message to the host log. The host prefixes the plugin id, may truncate
+    /// long messages and may rate-limit. Never log secrets.
+    log: func(level: level, message: string);
+}
+
+/// Permission `storage`: private key/value settings and files of this plugin.
+/// Nothing stored here is visible to other plugins. The host may enforce a quota.
+interface storage {
+    use types.{error};
+
+    /// Read a string value. `none` if the key does not exist.
+    get-string: func(key: string) -> result<option<string>, error>;
+    /// Create or replace a string value.
+    set-string: func(key: string, value: string) -> result<_, error>;
+    /// Remove a string value. Removing a missing key is not an error.
+    delete-string: func(key: string) -> result<_, error>;
+    /// All keys that currently have a value.
+    list-keys: func() -> result<list<string>, error>;
+
+    /// Read a file from the plugin's private directory. `none` if it does not exist.
+    /// `name` is a plain file name: no path separators, not "." or "..", at most 255 bytes.
+    read-file: func(name: string) -> result<option<list<u8>>, error>;
+    /// Create or replace a file in the plugin's private directory.
+    write-file: func(name: string, data: list<u8>) -> result<_, error>;
+    /// Remove a file. Removing a missing file is not an error.
+    delete-file: func(name: string) -> result<_, error>;
+    /// Names of all files in the plugin's private directory.
+    list-files: func() -> result<list<string>, error>;
+}
+
+/// Permission `pick-file`: ask the user to choose one file. Plugins have no file system
+/// access; the host shows its own dialog EVERY time and hands over the content only.
+interface file-picker {
+    use types.{error};
+
+    record pick-options {
+        /// Dialog title. The host adds the plugin name so the user knows who is asking.
+        title: option<string>,
+        /// Allowed extensions without dot, e.g. ["csv", "json"]. Empty = any file.
+        extensions: list<string>,
+    }
+
+    record picked-file {
+        /// File name without directory.
+        name: string,
+        /// Complete content of the file.
+        data: list<u8>,
+    }
+
+    /// Returns `none` if the user cancelled the dialog.
+    /// Fails with `too-large` if the file exceeds the host's size cap.
+    pick-file: func(options: pick-options) -> result<option<picked-file>, error>;
+}
+
+/// Permission `network`: every network protocol goes through these two functions. The host
+/// only connects to hosts declared in the manifest (`network_hosts`), blocks loopback and
+/// private address ranges unless the user allowed them, and enforces size and time caps.
+interface network {
+    use types.{error};
+
+    record http-header {
+        name: string,
+        value: string,
+    }
+
+    record request {
+        /// GET, POST, PUT, DELETE, HEAD, PATCH, PROPFIND, ...
+        method: string,
+        /// Absolute http:// or https:// URL.
+        url: string,
+        headers: list<http-header>,
+        body: option<list<u8>>,
+        /// Timeout for the whole exchange. The host applies its own upper bound.
+        timeout-ms: option<u32>,
+    }
+
+    record response {
+        status: u16,
+        headers: list<http-header>,
+        body: list<u8>,
+    }
+
+    /// Perform one HTTP(S) request. The host follows redirects only while every hop stays
+    /// on the allow-list. A response with an HTTP error status is still `ok`.
+    http-request: func(request: request) -> result<response, error>;
+
+    record tcp-options {
+        /// Start TLS right after connecting (certificate checked against `host`).
+        tls: bool,
+        /// Timeout for connecting and for each later read/write.
+        timeout-ms: option<u32>,
+    }
+
+    /// An open TCP connection (optionally TLS). Dropping the handle closes it.
+    resource tcp-connection {
+        /// Read up to `max-bytes`. Blocks until at least one byte is available.
+        /// An empty list means the peer closed the connection.
+        read: func(max-bytes: u32) -> result<list<u8>, error>;
+        /// Write bytes, returns how many were accepted (at least 1 for non-empty input).
+        write: func(data: list<u8>) -> result<u32, error>;
+        /// Upgrade a plain connection to TLS (STARTTLS, explicit FTPS, ...).
+        start-tls: func() -> result<_, error>;
+    }
+
+    /// Open a TCP connection to `host:port`. `host` is a DNS name or IP literal and must
+    /// be covered by the manifest allow-list.
+    tcp-connect: func(host: string, port: u16, options: tcp-options) -> result<tcp-connection, error>;
+}
+
+/// Permission `leak-check`: ask the host whether a password appears in known breaches.
+/// The host uses a k-anonymity service (only a hash prefix leaves the device).
+interface leak-check {
+    use types.{error};
+
+    enum leak-status {
+        not-leaked,
+        leaked,
+        /// The service could not be reached or the user disabled leak checks.
+        unknown,
+    }
+
+    record leak-result {
+        status: leak-status,
+        /// How often the password was seen in breaches (0 unless `leaked`).
+        count: u64,
+    }
+
+    check-password: func(password: string) -> result<leak-result, error>;
+}

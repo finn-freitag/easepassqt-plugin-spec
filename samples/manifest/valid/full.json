@@ -1,0 +1,15 @@
+{
+  "id": "de.frozenassassine.ftp-database-source",
+  "name": "FTP Database Source",
+  "version": "1.2.0-beta.1",
+  "api_version": 1,
+  "description": "Keeps your encrypted database on an FTP, FTPS or SFTP server.",
+  "author": "Example Author",
+  "homepage": "https://example.com/plugin",
+  "license": "MIT",
+  "os": ["windows", "linux", "macos"],
+  "min_app_version": "2.0.0",
+  "network_hosts": ["*:21", "*:22", "api.example.com:443", "*.example.org:*", "192.0.2.10:8443", "[2001:db8::1]:443"],
+  "permissions": ["storage", "network"],
+  "future_property": "ignored by hosts that do not know it"
+}
