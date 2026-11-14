@@ -32,7 +32,7 @@ tighten.
 | --- | --- |
 | Package size | 16 MiB |
 | `plugin.wasm` size | 16 MiB |
-| Linear memory per instance | 256 MiB |
+| Linear memory per instance | 64 MiB |
 | Time per call (excluding time the user spends in a host dialog) | 30 s, `read-database`/`write-database` 120 s |
 | Byte list (`list<u8>`) passed in one call, in either direction | 8 MiB |
 | String passed in one call | 8 MiB |
@@ -45,6 +45,12 @@ The byte-list cap covers the file returned by `pick-file`, storage files, HTTP b
 of Wasmtime (C and .NET) represents `list<u8>` as one tagged value of 32 bytes per byte,
 so an 8 MiB list costs the host about 256 MiB for a moment. Larger data has to be moved
 in several calls.
+
+The memory limit is small for the same reason. A host can refuse a large byte list it is
+about to pass INTO a plugin, but a list a plugin RETURNS is converted by the runtime before
+the host sees its size. The plugin's memory limit is therefore the only bound: with 64 MiB
+a hostile plugin can make the host allocate roughly 2 GiB for a moment. Hosts that cannot
+accept that should lower the limit further.
 
 Exceeding a limit inside a host function returns the error `too-large` or `timeout`.
 Exceeding the memory or time limit of the plugin itself stops the call (fuel or epoch
