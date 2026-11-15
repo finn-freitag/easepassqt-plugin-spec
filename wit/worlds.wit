@@ -5,7 +5,7 @@ package easepass:plugin@1.0.0;
 //
 //     world my-plugin {
 //         include easepass:plugin/importer-plugin@1.0.0;
-//         include easepass:plugin/about-plugin@1.0.0;
+//         include easepass:plugin/password-generator-plugin@1.0.0;
 //     }
 //
 // The worlds offer every host interface, but a component only imports what its code
@@ -20,16 +20,6 @@ world host-imports {
     import leak-check;
     import wasi:random/random@0.2.0;
     import wasi:clocks/wall-clock@0.2.0;
-}
-
-world about-plugin {
-    include host-imports;
-    export about;
-}
-
-world initializer-plugin {
-    include host-imports;
-    export initializer;
 }
 
 world importer-plugin {

@@ -10,24 +10,15 @@ plugin holds the types and permissions a host must compute.
 
 | Plugin | Types | Permissions | Other imports |
 | --- | --- | --- | --- |
-| `about` | `about`, `initializer` | - | `log` |
 | `importer` | `importer` | `pick-file` | `log` |
 | `database-source` | `database-source` | `storage` | `wasi:clocks/wall-clock` |
 | `password-generator` | `password-generator` | `leak-check` | `wasi:random/random` |
 | `store-feed` | `store-feed` | - | - |
 | `network` | `importer` | `network` | - |
 
-## about
-
-- `info()` returns name `Conformance: about`, description
-  `Exports about and initializer. Needs no permission.`, author `Ease Pass plugin spec`,
-  author-url `https://github.com/finn-freitag/easepassqt-plugin-spec`.
-- `init()` logs `conformance-about: init` with level `info` and returns `ok`.
-
 ## importer
 
 - `sources()` returns `fixed` ("Fixed items") and `csv-file` ("CSV file").
-- `passwords-available(id)`: `true` for both, `not-found` for anything else.
 - `import-passwords("fixed")` logs `conformance-importer: importing fixed items` (`info`)
   and returns two items:
   1. display-name `Example`, user-name `alice`, email `alice@example.com`, website
@@ -54,7 +45,6 @@ plugin holds the types and permissions a host must compute.
 One database with id `main`, stored in the plugin's private storage (file `main.epdb`,
 keys `database_name`, `read_only`, `last_modified`, `logged_in`).
 
-- `provider-name()`: `Conformance storage`.
 - `config-schema()`: object with `database_name` (string, 1-80 characters) and
   `read_only` (boolean), both required.
 - `get-config()` initially returns
@@ -72,7 +62,6 @@ keys `database_name`, `read_only`, `last_modified`, `logged_in`).
 
 ## password-generator
 
-- `name()`: `Conformance generator`.
 - `generate(options)`: `length` characters drawn uniformly from the characters of
   `options.characters` with `wasi:random/random`. Empty `characters` or length 0:
   `invalid-argument`; length above 4096: `too-large`.

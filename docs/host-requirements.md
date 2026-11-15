@@ -22,7 +22,6 @@ tighten.
 - Re-check the stored hash and repeat the inspection every time.
 - Build the linker explicitly: define the neutral interfaces and the interfaces of the
   approved permissions, nothing else. Never use "link all WASI".
-- If the plugin exports `initializer`, call `init` once before any other export.
 - A plugin instance is used by one thread at a time (one worker thread per plugin). The
   UI thread never waits for a plugin call.
 
@@ -34,8 +33,9 @@ tighten.
 | `plugin.wasm` size | 16 MiB |
 | Linear memory per instance | 64 MiB |
 | Time per call (excluding time the user spends in a host dialog) | 30 s, `read-database`/`write-database` 120 s |
-| Byte list (`list<u8>`) passed in one call, in either direction | 8 MiB |
-| String passed in one call | 8 MiB |
+| Byte list (`list<u8>`) passed in one call, in either direction | 2 MiB |
+| String passed in one call | 2 MiB |
+| Database file of a `database-source` plugin | 2 MiB |
 | Storage per plugin | 64 MiB, 1024 keys, 1024 files |
 | Open TCP connections per plugin | 8 |
 | Log message | 4096 bytes, rate-limited |
@@ -43,8 +43,11 @@ tighten.
 The byte-list cap covers the file returned by `pick-file`, storage files, HTTP bodies,
 `tcp-read`/`tcp-write` and database files. It is deliberately small: the dynamic value API
 of Wasmtime (C and .NET) represents `list<u8>` as one tagged value of 32 bytes per byte,
-so an 8 MiB list costs the host about 256 MiB for a moment. Larger data has to be moved
-in several calls.
+so a 2 MiB list costs the host about 64 MiB for a moment. Wasmtime also stops a call once
+about 128 MiB of such values were copied between host and plugin, which is reached at
+roughly 2.6 MiB of bytes per call in total. A database file crosses twice within one
+call (network to plugin, plugin to host), hence its limit. Larger data has to be moved in
+several calls.
 
 The memory limit is small for the same reason. A host can refuse a large byte list it is
 about to pass INTO a plugin, but a list a plugin RETURNS is converted by the runtime before

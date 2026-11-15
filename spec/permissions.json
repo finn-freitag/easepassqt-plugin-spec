@@ -32,18 +32,6 @@
   ],
   "types": [
     {
-      "id": "about",
-      "export": "easepass:plugin/about",
-      "prompt": false,
-      "text": "Shows information about itself"
-    },
-    {
-      "id": "initializer",
-      "export": "easepass:plugin/initializer",
-      "prompt": false,
-      "text": "Runs when Ease Pass starts"
-    },
-    {
       "id": "importer",
       "export": "easepass:plugin/importer",
       "prompt": true,

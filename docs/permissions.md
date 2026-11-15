@@ -63,8 +63,6 @@ The set is fixed. New permissions only come with a new API version
 
 | Exported interface | Type id | Asks the user | Text in the install dialog |
 | --- | --- | --- | --- |
-| `easepass:plugin/about` | `about` | no | - |
-| `easepass:plugin/initializer` | `initializer` | no | - |
 | `easepass:plugin/importer` | `importer` | yes | Adds passwords to your database |
 | `easepass:plugin/database-source` | `database-source` | yes | Stores your encrypted database elsewhere (it only receives encrypted data) |
 | `easepass:plugin/password-generator` | `password-generator` | yes | Generates passwords: its output becomes your passwords |

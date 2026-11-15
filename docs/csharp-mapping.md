@@ -6,12 +6,12 @@ compatibility. The table shows where each concept went.
 
 | C# (`EasePassExtensibility`) | This specification |
 | --- | --- |
-| `IAboutPlugin` (name, description, author, author URL, icon) | export `about`; the icon is `icon.png` in the package |
-| `IInitializer.Init()` | export `initializer` |
-| `IPasswordImporter` (`SourceName`, `SourceIcon`, `ImportPasswords`, `PasswordsAvailable`) | export `importer`; one plugin lists any number of `import-source`s instead of one class per source; no per-source icon |
+| `IAboutPlugin` (name, description, author, author URL, icon) | `manifest.json` (name, description, author, homepage) and `icon.png` in the package; no export, the host shows them without running the plugin |
+| `IInitializer.Init()` | removed; a plugin runs only when the host calls one of its exports |
+| `IPasswordImporter` (`SourceName`, `SourceIcon`, `ImportPasswords`, `PasswordsAvailable`) | export `importer`; one plugin lists any number of `import-source`s instead of one class per source; no per-source icon, no `PasswordsAvailable` (an import that finds nothing returns an empty list) |
 | `PasswordItem` | record `password-item` (TOTP fields grouped as `option<totp>`, `tags` added) |
 | `IPasswordGenerator` (`Init` + `Generate`) | export `password-generator`; the settings are passed to `generate`, leak checks go through the `leak-check` import instead of a delegate |
-| `IDatabaseProvider` | export `database-source`: `provider-name`, `list-databases`, `get-config`, `set-config` |
+| `IDatabaseProvider` | export `database-source`: `list-databases`, `get-config`, `set-config`; the provider is shown under the plugin's name |
 | `IDatabaseProvider.GetSampleJsonConfig`, `ExternalConfigEditingSupport`, `OpenExternalConfigEditor` | `config-schema`: a JSON Schema the host renders as a form. Plugins have no UI and cannot start programs |
 | `IDatabaseSource` (name, description, read-only, availability, last modified) | record `database-info`, addressed by `id` |
 | `IDatabaseSource.OnPropertyChanged` | removed; the host polls `get-database` |

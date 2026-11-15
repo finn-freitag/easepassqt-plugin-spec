@@ -2,28 +2,10 @@ package easepass:plugin@1.0.0;
 
 // Plugin interfaces (plugin exports). The host computes the plugin TYPE from the
 // interfaces a component exports. A plugin may export several of them.
-
-/// Type `about`: information shown in the plugin manager.
-interface about {
-    record plugin-info {
-        name: string,
-        description: string,
-        author: string,
-        /// Website of the author or the plugin (http/https), if any.
-        author-url: option<string>,
-    }
-
-    info: func() -> plugin-info;
-}
-
-/// Type `initializer`: code that runs once each time the host loads the plugin.
-interface initializer {
-    use types.{error};
-
-    /// Called before any other export. An error is logged and disables the plugin
-    /// until the next start.
-    init: func() -> result<_, error>;
-}
+//
+// Name, description, author, website and icon of a plugin come from its package
+// (manifest.json, icon.png), not from an export: the host shows them without running the
+// plugin. A provider or generator is shown under the plugin's name.
 
 /// Type `importer`: adds passwords from another service or file to the open database.
 interface importer {
@@ -40,10 +22,6 @@ interface importer {
 
     /// The sources this plugin offers (at least one).
     sources: func() -> list<import-source>;
-
-    /// Cheap check whether a source currently has something to import. The host may
-    /// skip this call.
-    passwords-available: func(source-id: string) -> result<bool, error>;
 
     /// Return the passwords of one source. The host shows them to the user, who chooses
     /// which ones are added. `cancelled` if the user aborted (e.g. closed a file dialog).
@@ -74,9 +52,6 @@ interface database-source {
         /// Last modification in seconds since 1970-01-01T00:00:00Z, if known.
         last-modified: option<u64>,
     }
-
-    /// Name of the provider, e.g. "FTP server".
-    provider-name: func() -> string;
 
     /// JSON Schema (draft 2020-12, object with flat properties) of the configuration.
     /// The host renders a form from it; plugins have no UI of their own.
@@ -116,9 +91,6 @@ interface password-generator {
         /// The password should not appear in known breaches (use `leak-check`).
         verify-not-leaked: bool,
     }
-
-    /// Name shown in the generator selection.
-    name: func() -> string;
 
     generate: func(options: generator-options) -> result<string, error>;
 }

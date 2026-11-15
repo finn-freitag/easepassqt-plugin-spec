@@ -98,13 +98,6 @@ impl Guest for Plugin {
         ]
     }
 
-    fn passwords_available(source_id: String) -> Result<bool, Error> {
-        match source_id.as_str() {
-            "fixed" | "csv-file" => Ok(true),
-            _ => Err(error(ErrorCode::NotFound, "unknown source")),
-        }
-    }
-
     fn import_passwords(source_id: String) -> Result<Vec<PasswordItem>, Error> {
         match source_id.as_str() {
             "fixed" => {

@@ -134,10 +134,6 @@ fn info() -> Result<DatabaseInfo, Error> {
 }
 
 impl Guest for Plugin {
-    fn provider_name() -> String {
-        "Conformance storage".into()
-    }
-
     fn config_schema() -> String {
         CONFIG_SCHEMA.into()
     }

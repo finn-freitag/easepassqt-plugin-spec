@@ -33,8 +33,6 @@ The **type** of a plugin is computed from the interfaces it exports
 | `database-source` | `easepass:plugin/database-source` | Stores the **encrypted** database elsewhere |
 | `password-generator` | `easepass:plugin/password-generator` | Generates passwords |
 | `store-feed` | `easepass:plugin/store-feed` | Provides additional plugin catalogs |
-| `about` | `easepass:plugin/about` | Information for the plugin manager |
-| `initializer` | `easepass:plugin/initializer` | Runs code when the plugin is loaded |
 
 ## What a plugin may use
 
@@ -87,15 +85,14 @@ in this repository provides both.
 
    impl Guest for Plugin {
        fn sources() -> Vec<ImportSource> { /* ... */ }
-       fn passwords_available(source_id: String) -> Result<bool, Error> { Ok(true) }
        fn import_passwords(source_id: String) -> Result<Vec<PasswordItem>, Error> { /* ... */ }
    }
 
    export!(Plugin);
    ```
 
-   The complete examples are in [`conformance/`](conformance);
-   [`conformance/about`](conformance/about/src/lib.rs) shows a plugin with two types.
+   The complete examples are in [`conformance/`](conformance). Name, description, author
+   and icon of the plugin come from `manifest.json` and `icon.png` in the package.
 
 3. Build the module, turn it into a component and look at what it imports:
 

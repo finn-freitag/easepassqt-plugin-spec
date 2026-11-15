@@ -38,10 +38,6 @@ fn generate_once(characters: &[char], length: u32) -> String {
 }
 
 impl Guest for Plugin {
-    fn name() -> String {
-        "Conformance generator".into()
-    }
-
     fn generate(options: GeneratorOptions) -> Result<String, Error> {
         let characters: Vec<char> = options.characters.chars().collect();
         if characters.is_empty() {

@@ -118,10 +118,6 @@ impl Guest for Plugin {
         ]
     }
 
-    fn passwords_available(_source_id: String) -> Result<bool, Error> {
-        Ok(true)
-    }
-
     fn import_passwords(source_id: String) -> Result<Vec<PasswordItem>, Error> {
         match source_id.split_once(' ') {
             Some(("http", arguments)) => http(arguments),
